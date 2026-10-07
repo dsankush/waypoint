@@ -1,36 +1,39 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Waypoint
 
-## Getting Started
+*Your career, mapped.* A private portal where each person fills in everything needed for a job application,
+talks to a Career Advisor, and meets a personal guide character. An admin account can see and manage everyone.
 
-First, run the development server:
+Built with Next.js (App Router), TypeScript, Tailwind, shadcn/ui and Supabase (Postgres + private Storage).
+All database access happens on the server only.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Features
+- Three candidate accounts and one admin account, each with its own password
+- 8-step profile with autosave, repeatable education and experience entries, resume upload
+- **Quick fill** on every step: write or paste, preview, then apply
+- Career Advisor chat that fills the form live and remembers the conversation
+- A guide character and note chosen from the person's context, refreshed only when something meaningful changes
+- Gamified welcome pop-up on every sign-in
+- Admin dashboard: totals, sign-ins, per-candidate detail, reopen / reset / export
+- Mobile-app layout on phones, a full web layout (collapsible sidebar) on desktop
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Setup
+1. Create a Supabase project and run, in order, the SQL in `supabase/migrations/` (`0001_init.sql`, then `0002_quickfill_context_thankyou.sql`).
+2. Copy `.env.example` to `.env.local` and fill in every value.
+3. `npm install`
+4. `npm run dev` and open http://localhost:3000
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Environment variables
+Set these locally in `.env.local` and on Vercel under Project Settings → Environment Variables.
+None of them may use the `NEXT_PUBLIC_` prefix.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Variable | Purpose |
+|---|---|
+| `PASSWORD_AYUSHI`, `PASSWORD_GAURAV`, `PASSWORD_PAWAN`, `PASSWORD_ADMIN` | Sign-in passwords (server only) |
+| `SESSION_SECRET` | Signs the session cookie (`openssl rand -base64 32`) |
+| `OPENAI_API_KEY`, `OPENAI_MODEL`, `OPENAI_FAST_MODEL` | Advisor, Quick fill and guide |
+| `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` | Database and storage (service role, server only) |
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Notes
+- Never commit `.env.local`. The service role key bypasses all database protections.
+- Row Level Security is on for every table with no policies, so the public (anon) key can read nothing.
+- To run a second dev server or build without touching `.next`, set `NEXT_DIST_DIR=.next-test`.
